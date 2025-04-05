@@ -89,25 +89,25 @@
       audioBuffers[name] = await audioCtx.decodeAudioData(buf);
     }
 
-  function playSound(name) {
-  const buffer = audioBuffers[name];
-  if (buffer) {
-    // resume を常にここで確実に呼ぶ（必要ない場合は何もしない）
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    function playSound(name) {
+  	const buffer = audioBuffers[name];
+  	if (buffer) {
+  	  // resume を常にここで確実に呼ぶ（必要ない場合は何もしない）
+  	  if (audioCtx.state === 'suspended') {
+  	    audioCtx.resume();
+  	  }
 
-    const src = audioCtx.createBufferSource();
-    src.buffer = buffer;
+  	  const src = audioCtx.createBufferSource();
+  	  src.buffer = buffer;
 
-    const gain = audioCtx.createGain();
-    gain.gain.value = 1.0; // 音量調整可能
+  	  const gain = audioCtx.createGain();
+  	  gain.gain.value = 1.0; // 音量調整可能
 
-    src.connect(gain);
-    gain.connect(audioCtx.destination);
-    src.start(0);
-  }
-}
+    	src.connect(gain);
+    	gain.connect(audioCtx.destination);
+    	src.start(0);
+  		}		
+		}	
 
     async function startGame() {
       await audioCtx.resume();
