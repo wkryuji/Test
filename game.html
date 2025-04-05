@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>クリックゲーム</title>
+</head>
+<body>
+  <h1>スコア: <span id="score">0</span></h1>
+  <button onclick="increaseScore()">クリック！</button>
+
+  <script>
+    let score = 0;
+    function increaseScore() {
+      score++;
+      document.getElementById('score').textContent = score;
+    }
+  </script>
+</body>
+</html>
