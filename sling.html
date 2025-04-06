@@ -53,10 +53,10 @@
   </style>
 </head>
 <body>
-  <div id="startScreen"><button id="startBtn">start</button></div>
+  <div id="startScreen">    <button id="startBtn">start</button>  </div>
   <button id="resetBtn">reset</button>
   <button id="nextBtn">next</button>
-  <div id="clearMsg">game cleared!</div>
+  <div id="clearMsg">cleared!</div>
   <button id="restartBtn">start again</button>
 
   <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
@@ -124,13 +124,33 @@
   		}		
 		}	
 
+    // 作成日時を定義
+    const createdDate = "2025年4月6日 9:52"; // 作成日時をここに記載
+
+    function displayCreatedDate() {
+      const versionInfo = document.createElement("div");
+      versionInfo.style.position = "absolute";
+      versionInfo.style.top = "10px";
+      versionInfo.style.right = "10px";
+      versionInfo.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+      versionInfo.style.color = "white";
+      versionInfo.style.padding = "5px 10px";
+      versionInfo.style.borderRadius = "5px";
+      versionInfo.style.fontSize = "14px";
+      versionInfo.textContent = `バージョン: ${createdDate}`;
+      document.body.appendChild(versionInfo);
+    }
+
+    // 起動時に作成日時を表示
+    displayCreatedDate();
+
     async function startGame() {
       await audioCtx.resume();
       await Promise.all([
         loadSound('start', 'img/start.mp3'),
         loadSound('crush', 'img/crush.mp3')
       ]);
-      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("startScreen").style.display = "none"; // 起動画面を非表示
       document.getElementById("resetBtn").style.display = "block";
       document.getElementById("restartBtn").style.display = "none";
       currentStage = 0;
@@ -392,6 +412,6 @@
     document.getElementById("resetBtn").addEventListener("click", reset);
     document.getElementById("nextBtn").addEventListener("click", nextStage);
     document.getElementById("restartBtn").addEventListener("click", restartGame);
-  </script>
+</script>
 </body>
 </html>
