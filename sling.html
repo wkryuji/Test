@@ -86,10 +86,12 @@
     // Unlock AudioContext on user interaction
     function unlockAudioContext() {
       if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().then(() => {
+          console.log('AudioContext resumed');
+        }).catch((e) => {
+          console.error('AudioContext resume failed:', e);
+        });
       }
-      document.body.removeEventListener('click', unlockAudioContext);
-      document.body.removeEventListener('touchstart', unlockAudioContext);
     }
     document.body.addEventListener('click', unlockAudioContext);
     document.body.addEventListener('touchstart', unlockAudioContext);
