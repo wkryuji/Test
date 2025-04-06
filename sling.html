@@ -73,7 +73,8 @@
     const targets = [];
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const anchor = { x: 100, y: height - 120 };
+    // ボールの初期位置を画面の中央寄りに変更
+    const anchor = { x: width / 4, y: height - 120 }; // 画面の幅の1/4の位置に設定
     const wallThickness = 50;
 
     let currentStage = 0;
@@ -81,6 +82,18 @@
     let nextShown = false;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Unlock AudioContext on user interaction
+    function unlockAudioContext() {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      document.body.removeEventListener('click', unlockAudioContext);
+      document.body.removeEventListener('touchstart', unlockAudioContext);
+    }
+    document.body.addEventListener('click', unlockAudioContext);
+    document.body.addEventListener('touchstart', unlockAudioContext);
+
     const audioBuffers = {};
 
     async function loadSound(name, url) {
@@ -219,14 +232,59 @@
       World.add(world, mouseConstraint);
       render.mouse = mouse;
 
-      Events.on(mouseConstraint, 'enddrag', (event) => {
-        if (event.body === ball) {
+      // マウスの位置を画面内に制限
+      document.addEventListener('mousemove', (event) => {
+        const rect = render.canvas.getBoundingClientRect();
+        const mouseX = Math.max(rect.left, Math.min(event.clientX, rect.right));
+        const mouseY = Math.max(rect.top, Math.min(event.clientY, rect.bottom));
+        mouse.position.x = mouseX - rect.left;
+        mouse.position.y = mouseY - rect.top;
+      });
+
+      let isSlingReleased = false; // スリングが解除されたかを追跡
+
+      // スリング解除処理を関数化
+      function releaseSling() {
+        if (!isSlingReleased && sling && ball) {
+          isSlingReleased = true; // スリング解除フラグを設定
+
+          // スリングの張力に基づいてボールに速度を設定
+          const slingForceX = (sling.pointA.x - ball.position.x) * 0.05; // 張力のX成分
+          const slingForceY = (sling.pointA.y - ball.position.y) * 0.05; // 張力のY成分
+
+          // 最小限の速度を保証する（勢いが小さすぎる場合を防ぐ）
+          const minForce = 5; // 最小速度のしきい値
+          const velocity = {
+            x: Math.abs(slingForceX) < minForce ? Math.sign(slingForceX) * minForce : slingForceX,
+            y: Math.abs(slingForceY) < minForce ? Math.sign(slingForceY) * minForce : slingForceY
+          };
+
+          // ボールに速度を設定
+          Body.setVelocity(ball, velocity);
+
+          // スリングを解除
           setTimeout(() => {
             World.remove(world, sling);
             sling = null;
             slingReleased = true;
             playSound('start');
+            isSlingReleased = false; // 次回のためにリセット
           }, 10);
+        }
+      }
+
+      // マウスが画面内外問わず離されたときにスリングを解除
+      window.addEventListener('mouseup', () => {
+        if (mouseConstraint.body === ball) {
+          mouseConstraint.constraint.bodyB = null; // マウス制約を解除
+          releaseSling();
+        }
+      });
+
+      // Matter.jsのenddragイベントでもスリング解除を呼び出し
+      Events.on(mouseConstraint, 'enddrag', (event) => {
+        if (event.body === ball) {
+          releaseSling();
         }
       });
 
