@@ -116,7 +116,7 @@
   	  src.buffer = buffer;
 
   	  const gain = audioCtx.createGain();
-  	  gain.gain.value = 0.2; // 音量調整可能
+  	  gain.gain.value = 0.1; // 音量調整可能
 
     	src.connect(gain);
     	gain.connect(audioCtx.destination);
@@ -125,7 +125,7 @@
 		}	
 
     // 作成日時を定義
-    const createdDate = "2025年4月6日 10:07"; // 作成日時をここに記載
+    const createdDate = "2025年4月6日 10:10"; // 作成日時をここに記載
 
     function displayCreatedDate() {
       const versionInfo = document.createElement("div");
